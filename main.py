@@ -5,17 +5,7 @@ import re
 import datetime
 import os
 
-def install_dependencies():
-    try:
-        # Run system-level commands to update package lists and install dependencies
-        subprocess.check_call(['sudo', 'apt-get', 'update'])
-        subprocess.check_call(['sudo', 'apt-get', 'install', '-y', 'tesseract-ocr', 'libtesseract-dev'])
-        # Install Hebrew language support for Tesseract
-        subprocess.check_call(['sudo', 'apt-get', 'install', '-y', 'tesseract-ocr-heb'])
-        print("Dependencies installed successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error installing dependencies: {e}")
-        exit(1)
+
 
 def analyze_payment_receipt(image_path):
     """
@@ -68,8 +58,7 @@ def analyze_payment_receipt(image_path):
         return {"error": str(e)}
 
 def main():
-    # Install dependencies (Tesseract and libtesseract)
-    install_dependencies()
+   
     
     # Set the default image path to 'paybox.jpg' in the current directory
     image_path = 'paybox.jpg'
