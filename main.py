@@ -69,7 +69,7 @@ def main():
    
     
     # Set the default image path to 'paybox.jpg' in the current directory
-    image_path = 'paybox.jpg'
+    image_path = 'HE.png'
     
     # Check if the file exists
     if not os.path.exists(image_path):
