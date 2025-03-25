@@ -1,23 +1,26 @@
-# Use an official Python runtime as a base image
-FROM python:3.9-slim
+# Use the correct Python version
+FROM python:3.11-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# Copy app files
 COPY . /app
 
-# Install system dependencies for Tesseract OCR and Hebrew language support
+# Install system dependencies for Tesseract
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     libtesseract-dev \
-    tesseract-ocr-heb
+    tesseract-ocr-heb \
+    libleptonica-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install any necessary Python dependencies from requirements.txt
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port (if needed for your app)
+# Expose port (if needed)
 EXPOSE 8000
 
-# Command to run your Python app
+# Run the app
 CMD ["python", "main.py"]
