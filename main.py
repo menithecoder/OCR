@@ -24,9 +24,10 @@ def analyze_payment_receipt(image_path):
         # Extract text using English OCR
         text_eng = pytesseract.image_to_string(image, lang='eng')
         
-        # Combine both results
-        text = text_heb + "\n" + text_eng
-        print(text)
+        
+        print(text_heb)
+        print("#############################################")
+        print(text_eng)
         # Initialize results dictionary
         payment_info = {
             'name': None,
