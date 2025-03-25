@@ -19,7 +19,13 @@ def analyze_payment_receipt(image_path):
         # Open the image
         image = Image.open(image_path)
         # Extract text using OCR - assuming Hebrew language
-        text = pytesseract.image_to_string(image, lang='heb')
+        text_heb = pytesseract.image_to_string(image, lang='heb')
+        
+        # Extract text using English OCR
+        text_eng = pytesseract.image_to_string(image, lang='eng')
+        
+        # Combine both results
+        text = text_heb + "\n" + text_eng
         print(text)
         # Initialize results dictionary
         payment_info = {
