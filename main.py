@@ -24,7 +24,7 @@ def analyze_payment_receipt(image_path):
         text_heb = pytesseract.image_to_string(image, lang='heb')
         text_eng = pytesseract.image_to_string(image, lang='eng')
         text = text_heb
-
+        print(text_heb)
         payment_info = {
             'name': None,
             'account_number': None,
