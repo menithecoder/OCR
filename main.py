@@ -66,7 +66,6 @@ def analyze_payment_receipt(image_path):
         return {"error": str(e)}
 
 def main():
-   
     # Set the default image path to 'paybox.jpg' in the current directory
     image_path = 'paybox.jpg'
     
