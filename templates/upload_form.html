@@ -2,23 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Payment Receipt</title>
 </head>
 <body>
-    <h1>Upload a Payment Receipt for Analysis</h1>
-    <form action="/analyze/" method="post" enctype="multipart/form-data">
-        <label for="file">Choose an image:</label>
-        <input type="file" name="file" id="file" required>
+    <h2>Upload a Payment Receipt</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
         <button type="submit">Upload</button>
     </form>
 
     {% if result %}
-        <h2>Analysis Results:</h2>
-        <p><strong>Name:</strong> {{ result.name }}</p>
-        <p><strong>Account Number:</strong> {{ result.account_number }}</p>
-        <p><strong>Amount:</strong> {{ result.amount }} ₪</p>
-        <p><strong>Date:</strong> {{ result.date }}</p>
+        <h3>Result:</h3>
+        {% if result.error %}
+            <p style="color: red;">Error: {{ result.error }}</p>
+        {% else %}
+            <ul>
+                <li><strong>Name:</strong> {{ result.name }}</li>
+                <li><strong>Account Number:</strong> {{ result.account_number }}</li>
+                <li><strong>Amount:</strong> {{ result.amount }} ₪</li>
+                <li><strong>Date:</strong> {{ result.date }}</li>
+            </ul>
+            <pre>{{ result.raw_text }}</pre>
+        {% endif %}
     {% endif %}
 </body>
 </html>
