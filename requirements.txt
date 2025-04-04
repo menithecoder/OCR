@@ -2,3 +2,4 @@ pytesseract
 pillow
 fastapi
 uvicorn
+jinja2
