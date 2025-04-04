@@ -62,7 +62,7 @@ def analyze_payment_receipt(image_path):
 
 @app.get("/", response_class=HTMLResponse)
 async def upload_form(request: Request):
-    return templates.TemplateResponse("upload.html", {"request": request})
+    return templates.TemplateResponse("upload_form.html", {"request": request})
 
 @app.post("/upload", response_class=HTMLResponse)
 async def handle_upload(request: Request, file: UploadFile = File(...)):
