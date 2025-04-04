@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Payment Receipt</title>
+</head>
+<body>
+    <h1>Upload a Payment Receipt for Analysis</h1>
+    <form action="/analyze/" method="post" enctype="multipart/form-data">
+        <label for="file">Choose an image:</label>
+        <input type="file" name="file" id="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if result %}
+        <h2>Analysis Results:</h2>
+        <p><strong>Name:</strong> {{ result.name }}</p>
+        <p><strong>Account Number:</strong> {{ result.account_number }}</p>
+        <p><strong>Amount:</strong> {{ result.amount }} ₪</p>
+        <p><strong>Date:</strong> {{ result.date }}</p>
+    {% endif %}
+</body>
+</html>
