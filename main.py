@@ -1,33 +1,29 @@
-import subprocess
-import pytesseract
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from io import BytesIO
 from PIL import Image
+import pytesseract
 import re
 import datetime
 import os
+from fastapi import Request
 
+app = FastAPI()
 
+# Path to your templates directory
+templates = Jinja2Templates(directory="templates")
 
-def analyze_payment_receipt(image_path):
-    """
-    Analyze a payment receipt image and extract key information.
-    Args:
-        image_path (str): Path to the receipt image
-    Returns:
-        dict: Extracted payment information
-    """
+def analyze_payment_receipt(image: BytesIO):
     try:
-        # Open the image
-        image = Image.open(image_path)
-        # Extract text using OCR - assuming Hebrew language
+        # Open the image from the BytesIO object
+        image = Image.open(image)
+        
+        # Extract text using OCR
         text_heb = pytesseract.image_to_string(image, lang='heb')
-        
-        # Extract text using English OCR
         text_eng = pytesseract.image_to_string(image, lang='eng')
-        
-        text= text_heb
         print(text_heb)
-        print("#############################################")
-        print(text_eng)
+        text = text_heb
         # Initialize results dictionary
         payment_info = {
             'name': None,
@@ -36,20 +32,18 @@ def analyze_payment_receipt(image_path):
             'date': None,
             'raw_text': text
         }
-        # Extract account number - looking for pattern matching the one in the image (972-526045120)
+        
+        # Extract account number, amount, date, and name from the text
         account_match = re.search(r'(\d+[-]\d+)', text)
         if account_match:
             payment_info['account_number'] = account_match.group(1)
-        # Extract amount - looking for a number followed by ₪ (shekel symbol)
         amount_match = re.search(r'(\d+)\s*₪', text)
         if amount_match:
             payment_info['amount'] = float(amount_match.group(1))
         else:
-            # Alternative search for just numbers that might be the amount
             amount_match = re.search(r'[\n\r]\s*(\d+)\s*[\n\r]', text)
             if amount_match:
                 payment_info['amount'] = float(amount_match.group(1))
-        # Extract date - looking for date format DD/MM/YYYY
         date_match = re.search(r'(\d{2}/\d{2}/\d{4})', text)
         if date_match:
             date_str = date_match.group(1)
@@ -57,38 +51,29 @@ def analyze_payment_receipt(image_path):
                 payment_info['date'] = datetime.datetime.strptime(date_str, '%d/%m/%Y').date()
             except ValueError:
                 pass
-        # Extract name - typically after "הועבר על ידי" (transferred by) in Hebrew
         name_match = re.search(r'הועבר על ידי\s+(.+?)[\n\r]', text)
         if name_match:
             payment_info['name'] = name_match.group(1).strip()
+        
         return payment_info
     except Exception as e:
         return {"error": str(e)}
 
-def main():
-    # Set the default image path to 'paybox.jpg' in the current directory
-    image_path = 'paybox.jpg'
-    
-    # Check if the file exists
-    if not os.path.exists(image_path):
-        print(f"Error: '{image_path}' not found in the current directory.")
-        return
-    
-    result = analyze_payment_receipt(image_path)
-    
-    print("\n=== Payment Receipt Analysis ===")
-    if "error" in result:
-        print(f"Error: {result['error']}")
-    else:
-        print(f"Name: {result['name']}")
-        print(f"Account Number: {result['account_number']}")
-        print(f"Amount: {result['amount']} ₪")
-        if result['date']:
-            print(f"Date: {result['date'].strftime('%d/%m/%Y')}")
-        else:
-            print("Date: Not found")
-    
-    print("\nNote: For accurate results, ensure pytesseract is properly installed with Hebrew language support.")
+@app.get("/", response_class=HTMLResponse)
+async def get_upload_form(request: Request):
+    return templates.TemplateResponse("upload_form.html", {"request": request})
 
-if __name__ == "__main__":
-    main()
+@app.post("/analyze/")
+async def analyze(file: UploadFile = File(...)):
+    try:
+        image = await file.read()
+        result = analyze_payment_receipt(BytesIO(image))
+        
+        if "error" in result:
+            return {"error": result["error"]}
+        else:
+            return result
+    
+    except Exception as e:
+        return {"error": str(e)}
+
