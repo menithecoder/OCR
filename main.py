@@ -9,6 +9,7 @@ import datetime
 import os
 from fastapi import Request
 
+
 app = FastAPI()
 
 # Path to your templates directory
